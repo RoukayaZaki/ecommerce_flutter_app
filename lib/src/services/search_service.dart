@@ -1,8 +1,15 @@
 // lib/src/services/search_service.dart
 import '../models/product_model.dart';
+import 'package:design_by_contract/annotation.dart';
 
+part 'search_service.g.dart';
+
+@Contract()
 class SearchService {
-  List<ProductModel> searchByText(List<ProductModel> products, String query) {
+  @Precondition({
+    'products != null': 'Products list must not be null',
+  })
+  List<ProductModel> _searchByText(List<ProductModel> products, String query) {
     if (query.isEmpty) {
       return products;
     }

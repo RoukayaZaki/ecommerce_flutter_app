@@ -1,3 +1,9 @@
+import 'package:design_by_contract/annotation.dart';
+
+part 'product_model.g.dart';
+
+
+@Contract()
 class ProductModel {
   final String id;
   final String name;
@@ -7,6 +13,15 @@ class ProductModel {
   final String imageUrl;
   final String description;
 
+  @Precondition({
+    'id.isNotEmpty': 'Product ID is required',
+    'name.isNotEmpty': 'Name is required',
+    'categoryId.isNotEmpty': 'Category ID is required',
+    'price >= 0': 'Price cannot be negative',
+    'stockQuantity >= 0': 'Stock quantity cannot be negative',
+    'imageUrl.isNotEmpty': 'Image URL is required',
+    'description.isNotEmpty': 'Description is required',
+  })
   ProductModel({
     required this.id,
     required this.name,
@@ -29,7 +44,11 @@ class ProductModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  @Postcondition({
+    'result["price"] >= 0': 'price must be non-negative',
+    'result["stockQuantity"] >= 0': 'stock must be non-negative',
+  })
+  Map<String, dynamic> _toMap() {
     return {
       'name': name,
       'category_id': categoryId,

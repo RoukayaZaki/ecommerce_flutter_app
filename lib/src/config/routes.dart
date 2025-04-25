@@ -1,5 +1,7 @@
 // lib/src/config/routes.dart
 import 'package:flutter/material.dart';
+import 'package:design_by_contract/annotation.dart';
+
 
 // Common Screens
 import '../screens/common/splash_screen.dart';
@@ -33,8 +35,14 @@ import '../screens/admin/reports_screen.dart';
 import '../screens/admin/best_selling_chart_screen.dart';
 import '../screens/admin/manage_feedback_screen.dart';
 
+part 'routes.g.dart';
+
+@Contract({
+  'settings.name != null': 'Route name cannot be null',
+})
 class AppRoutes {
-  static Route<dynamic> generateRoute(RouteSettings settings) {
+  @Invariant()
+  Route<dynamic> _generateRoute(RouteSettings settings) {
     print('Navigating to: ${settings.name} with arguments: ${settings.arguments}');
     switch (settings.name) {
       // Common Routes

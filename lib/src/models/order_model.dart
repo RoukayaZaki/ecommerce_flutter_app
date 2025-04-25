@@ -1,6 +1,11 @@
 // lib/src/models/order_model.dart
 import 'order_item.dart';
+import 'package:design_by_contract/annotation.dart';
 
+part 'order_model.g.dart';
+
+
+@Contract()
 class OrderModel {
   final String id;
   final String userId;
@@ -8,6 +13,12 @@ class OrderModel {
   final double total;
   final DateTime date;
 
+  @Precondition({
+    'id.isNotEmpty': 'Order ID must be provided',
+    'userId.isNotEmpty': 'User ID must be provided',
+    'items.isNotEmpty': 'Items list must not be empty',
+    'total > 0': 'Total must be greater than zero',
+  })
   OrderModel({
     required this.id,
     required this.userId,
@@ -29,7 +40,12 @@ class OrderModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  @Postcondition({
+    'result["userId"] == userId': 'userId must match original value',
+    'result["items"].length == items.length': 'items count must match',
+    'result["total"] == total': 'total must match original value',
+  })
+  Map<String, dynamic> _toMap() {
     return {
       'userId': userId,
       'items': items.map((e) => e.toMap()).toList(),

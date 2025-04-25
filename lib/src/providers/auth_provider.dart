@@ -6,6 +6,11 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart'; // Import the UserModel
 
+import 'package:design_by_contract/annotation.dart';
+
+part 'auth_provider.g.dart';
+
+@Contract()
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -33,7 +38,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Sign Up Method
-  Future<void> signUp({
+  // TODO: check this try catch
+  @Precondition({
+    'email.isNotEmpty': 'Email must not be empty',
+    'password.isNotEmpty': 'Password must not be empty',
+  })
+  Future<void> _signUp({
     required String email,
     required String password,
     String? name,
@@ -69,7 +79,11 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Login Method with rememberMe
-  Future<void> login(String email, String password, bool rememberMe) async {
+  @Precondition({
+    'email.isNotEmpty': 'Email must not be empty',
+    'password.isNotEmpty': 'Password must not be empty',
+  })
+  Future<void> _login(String email, String password, bool rememberMe) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
@@ -82,7 +96,11 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Logout Method
-  Future<void> logout() async {
+  @Postcondition({
+    'currentUser == null': 'User should be null after logout',
+    'isAdmin == false': 'isAdmin should be false after logout',
+  })
+  Future<void> _logout() async {
     try {
       await _auth.signOut();
 
@@ -99,7 +117,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Send Password Reset Email
-  Future<void> sendPasswordReset(String email) async {
+  @Precondition({
+    'email.isNotEmpty': 'Email must not be empty',
+  })
+  Future<void> _sendPasswordReset(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
@@ -108,14 +129,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Update User Profile
-  Future<void> updateUserProfile({
+  @Precondition({
+    '_currentUser != null': 'No user is currently logged in.',
+  })
+  Future<void> _updateUserProfile({
     String? name,
     DateTime? birthDate,
   }) async {
-    if (_currentUser == null) {
-      throw Exception('No user is currently logged in.');
-    }
-
+    
     Map<String, dynamic> updatedData = {};
 
     if (name != null) {
